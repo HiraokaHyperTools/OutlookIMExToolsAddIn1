@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui" onLoad="Ribbon_Load">
+  <!-- [Office 365アイコン(imageMso)一覧(I) | 初心者備忘録](https://www.ka-net.org/blog/?p=11351#google_vignette) -->
+  <ribbon>
+    <tabs>
+      <tab id="imexToolsTab" label="IMEx Tools">
+        <group id="imexToolsImporters" label="Importers">
+          <button id="ImportFromThunderbird"
+                  imageMso="Import"
+                  onAction="ImportFromThunderbird"
+                  label="Import from Thunderbird"
+                  size="large"
+          />
+        </group>
+      </tab>
+    </tabs>
+  </ribbon>
+</customUI>
+
