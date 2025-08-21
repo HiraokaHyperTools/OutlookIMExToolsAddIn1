@@ -1,3 +1,4 @@
+using OutlookIMExToolsAddIn1.Usecases;
 using Microsoft.Office.Interop.Outlook;
 using OutlookIMExToolsAddIn1.Helpers;
 using System;
@@ -11,12 +12,14 @@ namespace OutlookIMExToolsAddIn1.Usecases
 {
     public class OutlookHelperUsecase
     {
+        private readonly VCardHelperUsecase _vCardHelperUsecase;
         private readonly Application _app;
 
         public OutlookHelperUsecase(
-            Microsoft.Office.Interop.Outlook.Application app
-        )
+            Microsoft.Office.Interop.Outlook.Application app,
+            VCardHelperUsecase vCardHelperUsecase)
         {
+            _vCardHelperUsecase = vCardHelperUsecase;
             _app = app;
         }
 
@@ -277,5 +280,178 @@ namespace OutlookIMExToolsAddIn1.Usecases
 
             return dli;
         }
+
+        public ContactItem ImportVCardWithAltTo(
+            string vcfBody,
+            MAPIFolder folder,
+            ContactOverwritePolicy policy
+        )
+        {
+            var lines = _vCardHelperUsecase.Parse(vcfBody)
+                .Select(_vCardHelperUsecase.ResolveCharsetAndEncoding);
+
+            var contact = (ContactItem)_app.CreateItem(OlItemType.olContactItem);
+
+            foreach (var line in lines)
+            {
+                bool IsKey(string key) => StringComparer.InvariantCultureIgnoreCase.Compare(line.Key, key) == 0;
+
+                line.Attributes.TryGetValue("TYPE", out string type);
+                bool IsType(string key) => StringComparer.InvariantCultureIgnoreCase.Compare(type ?? "", key) == 0;
+
+                line.Attributes.TryGetValue("VALUE", out string value);
+                bool IsValue(string key) => StringComparer.InvariantCultureIgnoreCase.Compare(value ?? "", key) == 0;
+
+                var cells = _vCardHelperUsecase.SplitAndUnescapeValueBySemic(line.Value ?? "");
+
+                if (false) { }
+                else if (IsKey("N"))
+                {
+                    contact.FirstName = cells[0];
+                    if (2 <= cells.Length)
+                    {
+                        contact.LastName = cells[1];
+                        if (3 <= cells.Length)
+                        {
+                            contact.MiddleName = cells[2];
+                        }
+                    }
+                }
+                else if (IsKey("FN"))
+                {
+                    contact.FullName = cells[0];
+                }
+                else if (IsKey("NICKNAME"))
+                {
+                    contact.NickName = cells[0];
+                }
+                else if (IsKey("EMAIL"))
+                {
+                    contact.Email1Address = cells[0];
+                    contact.Email1AddressType = "SMTP";
+                }
+                else if (IsKey("URL"))
+                {
+                    contact.PersonalHomePage = cells[0];
+                }
+                else if (IsKey("ADR"))
+                {
+                    // ADR:;;Street address;City;State/Province;ZIP/Postal code;Country
+
+                    if (3 <= cells.Length)
+                    {
+                        contact.HomeAddressStreet = cells[2];
+                        if (4 <= cells.Length)
+                        {
+                            contact.HomeAddressCity = cells[3];
+                            if (5 <= cells.Length)
+                            {
+                                contact.HomeAddressState = cells[4];
+                                if (6 <= cells.Length)
+                                {
+                                    contact.HomeAddressPostalCode = cells[5];
+                                    if (7 <= cells.Length)
+                                    {
+                                        contact.HomeAddressCountry = cells[6];
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (IsKey("TEL"))
+                {
+                    if (IsValue("") || IsValue("TEXT"))
+                    {
+                        if (false) { }
+                        else if (IsType("work"))
+                        {
+                            contact.BusinessTelephoneNumber = cells[0];
+                        }
+                        else if (IsType("home"))
+                        {
+                            contact.HomeTelephoneNumber = cells[0];
+                        }
+                        else if (IsType("cell"))
+                        {
+                            contact.MobileTelephoneNumber = cells[0];
+                        }
+                        else if (IsType("fax"))
+                        {
+                            contact.BusinessFaxNumber = cells[0];
+                        }
+                        else if (IsType("pager"))
+                        {
+                            contact.PagerNumber = cells[0];
+                        }
+                        else if (IsType(""))
+                        {
+                            contact.OtherTelephoneNumber = cells[0];
+                        }
+                    }
+                }
+                else if (IsKey("TZ"))
+                {
+                    // ignore
+                }
+                else if (IsKey("BDAY"))
+                {
+                    // BDAY;VALUE=DATE:20000101
+                    if (IsValue("") || IsValue("DATE"))
+                    {
+                        if (_vCardHelperUsecase.ParseDate(cells[0], out DateTime date))
+                        {
+                            contact.Birthday = date;
+                        }
+                    }
+                }
+                else if (IsKey("ANNIVERSARY"))
+                {
+                    // ANNIVERSARY;VALUE=DATE:20001231
+                    if (IsValue("") || IsValue("DATE"))
+                    {
+                        if (_vCardHelperUsecase.ParseDate(cells[0], out DateTime date))
+                        {
+                            contact.Anniversary = date;
+                        }
+                    }
+                }
+                else if (IsKey("NOTE"))
+                {
+                    contact.Body = cells[0];
+                }
+                else if (IsKey("UID"))
+                {
+                    // ignore
+                }
+                else if (IsKey("TITLE"))
+                {
+                    contact.JobTitle = cells[0];
+                }
+                else if (IsKey("ROLE"))
+                {
+                    // ignore
+                }
+                else if (IsKey("ORG"))
+                {
+                    // ORG:Company name;Department
+
+                    contact.CompanyName = cells[0];
+                    if (2 <= cells.Length)
+                    {
+                        contact.Department = cells[1];
+                    }
+                }
+            }
+
+            if (((Folder)contact.Parent).EntryID != folder.EntryID)
+            {
+                contact.Move(folder);
+            }
+            contact.Save();
+
+            return contact;
+        }
+
     }
 }
