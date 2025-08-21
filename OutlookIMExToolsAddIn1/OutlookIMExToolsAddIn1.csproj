@@ -267,6 +267,7 @@
     <Compile Include="Helpers\AddToDisposables.cs" />
     <Compile Include="Helpers\ContactOverwritePolicy.cs" />
     <Compile Include="Helpers\ExposeNoMails.cs" />
+    <Compile Include="Helpers\ImportVCardToDelegate.cs" />
     <Compile Include="Helpers\IThunderbirdAddrBook.cs" />
     <Compile Include="Helpers\IConverterSession.cs" />
     <Compile Include="Helpers\IExposeMails.cs" />

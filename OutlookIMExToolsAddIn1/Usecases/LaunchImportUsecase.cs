@@ -47,7 +47,8 @@ namespace OutlookIMExToolsAddIn1.Usecases
 
         public void LaunchContactsImport(
             IReadOnlyList<IThunderbirdAddrBook> nodes,
-            MAPIFolder folder
+            MAPIFolder folder,
+            ImportVCardToDelegate importVCardTo
         )
         {
             LaunchGenericImport(
@@ -55,6 +56,7 @@ namespace OutlookIMExToolsAddIn1.Usecases
                     _launchContactImportUsecase.LaunchImportAsync(
                         nodes,
                         folder,
+                        importVCardTo,
                         cancellationToken,
                         updateProgress,
                         logger

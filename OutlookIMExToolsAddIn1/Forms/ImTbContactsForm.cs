@@ -22,6 +22,7 @@ namespace OutlookIMExToolsAddIn1.Forms
         private readonly OutlookHelperUsecase _outlookHelperUsecase;
         private readonly ThunderbirdHelperUsecase _thunderbirdHelperUsecase;
         private readonly ThunderbirdProfilesUsecase _thunderbirdProfilesUsecase;
+        private readonly Func<ImportVCardToDelegate> _getImportVCardTo;
         private MAPIFolder _folder;
 
         public ImTbContactsForm(
@@ -39,8 +40,23 @@ namespace OutlookIMExToolsAddIn1.Forms
             _overwrite.Items.Add("Always duplicate");
             _overwrite.SelectedIndex = 0;
 
-            _importer.Items.Add("Outlook OpenSharedItem (will loose non-ANSI characters)");
+            var importers = new List<Tuple<string, ImportVCardToDelegate>>
+            {
+                Tuple.Create(
+                    "Outlook OpenSharedItem (will loose non-ANSI characters)",
+                    (ImportVCardToDelegate)_outlookHelperUsecase.ImportVCardTo
+                ),
+                Tuple.Create(
+                    "IMEx Tools contact converter",
+                    (ImportVCardToDelegate)_outlookHelperUsecase.ImportVCardWithAltTo
+                ),
+            };
+            _importer.DisplayMember = "Item1";
+            _importer.ValueMember = "Item2";
+            _importer.DataSource = importers.ToArray();
             _importer.SelectedIndex = 0;
+
+            _getImportVCardTo = () => _importer.SelectedValue as ImportVCardToDelegate;
         }
 
         private void _selectPopup_Click(object sender, EventArgs e)
@@ -211,9 +227,18 @@ namespace OutlookIMExToolsAddIn1.Forms
 
         private void _import_Click(object sender, EventArgs e)
         {
+            var importVCardTo = _getImportVCardTo();
+            if (importVCardTo == null)
+            {
+                _importer.Focus();
+                _importer.DroppedDown = true;
+                return;
+            }
+
             _launchImportUsecase.LaunchContactsImport(
                 _thunderbirdHelperUsecase.CreateContactImporterFrom(_tree.Nodes),
-                _folder
+                _folder,
+                importVCardTo
             );
         }
     }

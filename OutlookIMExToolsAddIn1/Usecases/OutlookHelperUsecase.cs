@@ -1,12 +1,13 @@
-using OutlookIMExToolsAddIn1.Usecases;
 using Microsoft.Office.Interop.Outlook;
 using OutlookIMExToolsAddIn1.Helpers;
+using OutlookIMExToolsAddIn1.Usecases;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
+using System.Text;
 
 namespace OutlookIMExToolsAddIn1.Usecases
 {
@@ -232,11 +233,14 @@ namespace OutlookIMExToolsAddIn1.Usecases
         }
 
         public ContactItem ImportVCardTo(
-            string vcfFile,
+            string vcfBody,
             MAPIFolder folder,
             ContactOverwritePolicy policy
         )
         {
+            var vcfFile = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.vcf");
+            File.WriteAllText(vcfFile, vcfBody, Encoding.Default);
+
             var contact = (ContactItem)_app.GetNamespace("MAPI").OpenSharedItem(vcfFile);
 
             if (((Folder)contact.Parent).EntryID != folder.EntryID)
@@ -244,6 +248,8 @@ namespace OutlookIMExToolsAddIn1.Usecases
                 contact.Move(folder);
             }
             contact.Save();
+
+            File.Delete(vcfFile);
 
             return contact;
         }

@@ -26,6 +26,7 @@ namespace OutlookIMExToolsAddIn1.Usecases
         public async Task LaunchImportAsync(
             IReadOnlyList<IThunderbirdAddrBook> nodes,
             MAPIFolder folder,
+            ImportVCardToDelegate importVCardTo,
             CancellationToken cancellationToken,
             Action<string, int> updateProgress,
             TextWriter logger
@@ -65,23 +66,19 @@ namespace OutlookIMExToolsAddIn1.Usecases
                         {
                             logger.WriteLine($"Converting card: {prop.Card}");
                             var vcf = prop.Value;
-                            var vcfFile = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.vcf");
-                            File.WriteAllText(vcfFile, vcf, Encoding.Default);
                             try
                             {
-                                contactUidTo[prop.Card] = _outlookHelperUsecase.ImportVCardTo(
-                                    vcfFile,
+                                contactUidTo[prop.Card] = importVCardTo(
+                                    vcf,
                                     folder,
                                     new ContactOverwritePolicy()
                                 );
                                 numConverted++;
                                 logger.WriteLine($"Converted.");
-
-                                File.Delete(vcfFile);
                             }
                             catch (System.Exception ex)
                             {
-                                logger.WriteLine($"Error importing contact from {vcfFile}: {ex}");
+                                logger.WriteLine($"Error importing contact: {ex}");
                             }
                         }
 
