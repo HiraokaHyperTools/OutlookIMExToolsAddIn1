@@ -249,7 +249,14 @@ namespace OutlookIMExToolsAddIn1.Usecases
             }
             contact.Save();
 
-            File.Delete(vcfFile);
+            try
+            {
+                File.Delete(vcfFile);
+            }
+            catch
+            {
+                // ignore
+            }
 
             return contact;
         }
