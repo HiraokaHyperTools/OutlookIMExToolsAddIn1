@@ -11,6 +11,12 @@
                   label="Import from Thunderbird"
                   size="large"
           />
+          <button id="ImportContactsFromThunderbird"
+                  imageMso="ContactAddMyContacts"
+                  onAction="ImportContactsFromThunderbird"
+                  label="Import contacts from Thunderbird"
+                  size="large"
+          />
         </group>
       </tab>
     </tabs>

@@ -36,11 +36,14 @@ namespace OutlookIMExToolsAddIn1
     public class Ribbon1 : Office.IRibbonExtensibility
     {
         private Office.IRibbonUI _ribbon;
+        private readonly Action _importContactsFromThunderbird;
         private readonly Action _importFromThunderbird;
 
         public Ribbon1(
-            Action importFromThunderbird)
+            Action importFromThunderbird,
+            Action importContactsFromThunderbird)
         {
+            _importContactsFromThunderbird = importContactsFromThunderbird;
             _importFromThunderbird = importFromThunderbird;
         }
 
@@ -91,6 +94,10 @@ namespace OutlookIMExToolsAddIn1
         {
             _importFromThunderbird();
         }
-        
+
+        public void ImportContactsFromThunderbird(Office.IRibbonControl control)
+        {
+            _importContactsFromThunderbird();
+        }
     }
 }

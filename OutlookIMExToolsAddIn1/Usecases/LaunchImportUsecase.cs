@@ -1,3 +1,4 @@
+using OutlookIMExToolsAddIn1.Usecases;
 using kenjiuno.AutoHourglass;
 using Microsoft.Office.Interop.Outlook;
 using OutlookIMExToolsAddIn1.Forms;
@@ -14,18 +15,55 @@ namespace OutlookIMExToolsAddIn1.Usecases
 {
     public class LaunchImportUsecase
     {
+        private readonly LaunchContactImportUsecase _launchContactImportUsecase;
+        private readonly LaunchMailImportUsecase _launchMailImportUsecase;
         private readonly Func<ImForm> _newImForm;
 
         public LaunchImportUsecase(
             Func<ImForm> newImForm
-            )
+, LaunchMailImportUsecase launchMailImportUsecase, LaunchContactImportUsecase launchContactImportUsecase)
         {
+            _launchContactImportUsecase = launchContactImportUsecase;
+            _launchMailImportUsecase = launchMailImportUsecase;
             _newImForm = newImForm;
         }
 
         public void LaunchImport(
             IReadOnlyList<ImportFolderNode> importFolderNodes,
             MAPIFolder folder
+        )
+        {
+            LaunchGenericImport(
+                (cancellationToken, updateProgress, logger) =>
+                    _launchMailImportUsecase.LaunchImportAsync(
+                        importFolderNodes,
+                        folder,
+                        cancellationToken,
+                        updateProgress,
+                        logger
+                    )
+            );
+        }
+
+        public void LaunchContactsImport(
+            IReadOnlyList<IThunderbirdAddrBook> nodes,
+            MAPIFolder folder
+        )
+        {
+            LaunchGenericImport(
+                (cancellationToken, updateProgress, logger) =>
+                    _launchContactImportUsecase.LaunchImportAsync(
+                        nodes,
+                        folder,
+                        cancellationToken,
+                        updateProgress,
+                        logger
+                    )
+            );
+        }
+
+        public void LaunchGenericImport(
+            LaunchGenericImporterDelegate launchGenericImporter
         )
         {
             var form = _newImForm();
@@ -71,9 +109,7 @@ namespace OutlookIMExToolsAddIn1.Usecases
                 }
             };
 
-            var importerTask = form.LaunchImportAsync(
-                importFolderNodes,
-                folder,
+            var importerTask = launchGenericImporter(
                 cts.Token,
                 UpdateProgress,
                 log

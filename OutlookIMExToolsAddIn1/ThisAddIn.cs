@@ -54,8 +54,16 @@ namespace OutlookIMExToolsAddIn1
         protected override Microsoft.Office.Core.IRibbonExtensibility CreateRibbonExtensibilityObject()
         {
             return new Ribbon1(
-                importFromThunderbird: ImportFromThunderbird
+                importFromThunderbird: ImportFromThunderbird,
+                importContactsFromThunderbird: ImportContactsFromThunderbird
             );
+        }
+
+        private void ImportContactsFromThunderbird()
+        {
+            _resolver.Resolve<ImTbContactsForm>()
+                .AddTo(_disposables)
+                .Show();
         }
 
         private void ImportFromThunderbird()

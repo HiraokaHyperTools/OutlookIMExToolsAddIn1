@@ -1,0 +1,23 @@
+BEGIN:VCARD
+VERSION:4.0
+N:コム;イグ\;ザンプル;ドット;;
+FN:イグ;ザンプル ドット コム
+NICKNAME:example.com
+EMAIL;PREF=1:dummy@example.com
+URL:https://example.com/
+ADR:;;Street address;City;State/Province;ZIP/Postal code;Country
+TEL;TYPE=work;VALUE=TEXT:Work
+TEL;TYPE=home;VALUE=TEXT:Home
+TEL;TYPE=cell;VALUE=TEXT:Cell
+TEL;TYPE=fax;VALUE=TEXT:Fax
+TEL;TYPE=pager;VALUE=TEXT:Pager
+TEL;VALUE=TEXT:None
+TZ:Asia/Tokyo
+BDAY;VALUE=DATE:20000101
+ANNIVERSARY;VALUE=DATE:20001231
+NOTE:Notes\n1\n2\n3\n
+UID:a92eeee9-b99d-4bdb-839e-0b803aa35276
+TITLE:Title
+ROLE:Role
+ORG:Company name;Department
+END:VCARD

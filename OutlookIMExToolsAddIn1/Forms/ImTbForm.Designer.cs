@@ -161,6 +161,7 @@
             // ImTbForm
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+            this.AutoScroll = true;
             this.ClientSize = new System.Drawing.Size(572, 477);
             this.Controls.Add(this._offAll);
             this.Controls.Add(this._onAll);
