@@ -1,0 +1,1 @@
+msbuild OutlookIMExToolsAddIn1.csproj /p:ManifestCertificateThumbprint=5E26D79C2A9C34A08DAB643FB12992B265509555 /p:ManifestKeyFile= %*
