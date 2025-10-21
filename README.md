@@ -6,6 +6,8 @@ This is a VSTO add-in. (Built on `net472`)
 
 ## Usage
 
+Download the latest `Setup_OutlookIMExToolsAddIn1.exe` from [Releases](https://github.com/HiraokaHyperTools/OutlookIMExToolsAddIn1/releases)
+
 Install `Setup_OutlookIMExToolsAddIn1.exe` and also VSTO add-in.
 
 Launch Microsoft Office Outlook.
@@ -33,3 +35,4 @@ Fortunately it is `Import suceeded!` in this case.
 ![](images/imp-done.png)
 
 The mails will be imported.
+
