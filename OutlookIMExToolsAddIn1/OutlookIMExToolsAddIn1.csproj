@@ -290,6 +290,12 @@
     <Compile Include="Usecases\ThunderbirdHelperUsecase.cs" />
     <Compile Include="Usecases\ThunderbirdProfilesUsecase.cs" />
     <Compile Include="Usecases\VCardHelperUsecase.cs" />
+    <Content Include="x64\SQLite.Interop.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="x86\SQLite.Interop.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <EmbeddedResource Include="Forms\ImForm.resx">
       <DependentUpon>ImForm.cs</DependentUpon>
     </EmbeddedResource>
